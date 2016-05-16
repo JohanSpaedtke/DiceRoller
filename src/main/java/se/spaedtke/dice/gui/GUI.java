@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.swing.Box;
 import javax.swing.JFrame;
@@ -26,7 +28,7 @@ public class GUI extends JFrame implements ActionListener {
 
 	private ChartPanel chart;
 	private JPanel controllPanel;
-	private DiceSimulator sim;
+	private List<DiceSimulator> simulators;
 
 	private final String initialDiceSpec;
 	private final List<String> diceSpecifications;
@@ -44,12 +46,11 @@ public class GUI extends JFrame implements ActionListener {
 	}
 
 	private void runInitialSimultaion() {
-		sim = DiceSimulator.with().diceSpecification(initialDiceSpec).build();
-		sim.roll();
+		simulators = Arrays.asList(DiceSimulator.with().diceSpecification(initialDiceSpec).build());
 	}
 
 	private void createComponents() {
-		chart = ComponentFactory.createChart(sim);
+		chart = ComponentFactory.createChart(simulators);
 		textInput = ComponentFactory.createTextInput(Optional.of(initialDiceSpec));
 		rerunButton = ComponentFactory.createRerunButton(this);
 		radioButtons = ComponentFactory.createRadioButtons(diceSpecifications, this);
@@ -84,13 +85,15 @@ public class GUI extends JFrame implements ActionListener {
 	}
 
 	private void rerunSimulation(String diceSpecifications) {
-		String[] specifications = diceSpecifications.split(";");
-		Arrays.asList(specifications).stream()
-		sim = DiceSimulator.with().diceSpecification(diceSpecification).build();
-		sim.roll();
+		String[] specifications = diceSpecifications.split(" *; *");
+		simulators = Arrays.asList(specifications).stream().map(toDiceSimulator()).collect(Collectors.toList());		
+	}
+
+	private Function<String, DiceSimulator> toDiceSimulator() {
+		return string -> DiceSimulator.with().diceSpecification(string).build();
 	}
 
 	private void updateChart() {
-		chart.setChart(ComponentFactory.barChart(sim));
+		chart.setChart(ComponentFactory.barChart(simulators));
 	}
 }

@@ -39,6 +39,11 @@ public class DiceSimulator {
 				return HIGH;
 			}
 		}
+		
+		@Override
+		public String toString(){
+			return this.name().toLowerCase();
+		}
 	}
 
 	private final int numRuns;
@@ -56,9 +61,10 @@ public class DiceSimulator {
 		this.whichToKeep = WHICH_TO_KEEP.fromString(builder.whichToKeep);
 		this.precission = builder.numDecimalPlaces != null ? Math.pow(10.0, builder.numDecimalPlaces) : Math.pow(10.0, 2);
 		this.staticBonus = builder.staticBonus != null ? builder.staticBonus : 0;
+		roll();
 	}
 
-	public void roll() {
+	private void roll() {
 		for (int i = 0; i < numRuns; i++) {
 			Integer roll = dice.stream()
 					.map(d -> d.roll())
@@ -69,6 +75,18 @@ public class DiceSimulator {
 		}
 	}
 
+	public String specification(){
+		StringBuilder sb = new StringBuilder();
+		sb.append(String.join(",", dice.stream().collect(Collectors.groupingBy(Die::getFaces)).entrySet().stream().map(e -> e.getValue().size() + "d" + e.getKey()).collect(Collectors.toList())));
+		if(staticBonus != 0){
+			sb.append(Math.signum(staticBonus) + staticBonus);
+		}
+		if(diceToKeep != dice.size()){
+			sb.append(" keep " + diceToKeep + " " + whichToKeep.toString());
+		}
+		return sb.toString();
+	}
+	
 	public Map<Integer, Integer> getHistogram(){
 		return Collections.unmodifiableMap(histogram);
 	}

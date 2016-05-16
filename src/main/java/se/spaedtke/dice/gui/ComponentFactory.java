@@ -3,15 +3,19 @@ package se.spaedtke.dice.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.ActionListener;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -21,9 +25,12 @@ import javax.swing.JTextField;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.LegendItem;
+import org.jfree.chart.LegendItemCollection;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.DatasetUtilities;
@@ -54,7 +61,7 @@ public class ComponentFactory {
 		return textInput;
 	}
 
-	public static ChartPanel createChart(DiceSimulator... simulations) {
+	public static ChartPanel createChart(List<DiceSimulator> simulations) {
 		ChartPanel chart = new ChartPanel(barChart(simulations)) {
 
 			@Override
@@ -66,18 +73,15 @@ public class ComponentFactory {
 		return chart;
 	}
 
-	public static JFreeChart barChart(DiceSimulator... simulation) {
-        final CategoryDataset ds = createDataset(simulation.getNormalizedHistogram());
+	public static JFreeChart barChart(List<DiceSimulator> simulations) {
+		final CategoryDataset ds = createDataset(simulations.stream().map(sim -> sim.getNormalizedHistogram()).collect(Collectors.toList()));
 
-		JFreeChart barChart = ChartFactory.createBarChart("Probabilities", "Combined dice total", "Percent of rolls", ds, PlotOrientation.VERTICAL, false, false, false);
-
-		BarRenderer renderer = (BarRenderer) barChart.getCategoryPlot().getRenderer();
-		simulation.getNormalizedHistogram().entrySet().forEach(e -> renderer.setSeriesPaint(e.getKey(), Color.red));
+		JFreeChart barChart = ChartFactory.createBarChart("Probabilities", "Combined dice total", "Percent of rolls", ds, PlotOrientation.VERTICAL, true, true, false);
 
 		NumberAxis mainAxis = (NumberAxis) barChart.getCategoryPlot().getRangeAxis();
 
 		mainAxis.setLowerBound(0);
-		mainAxis.setUpperBound(Math.ceil(100 * simulation.getNormalizedHistogram().values().stream().max((x, y) -> Double.compare(x, y)).map(Double::new).get()) / 100);
+		mainAxis.setUpperBound(Math.ceil(100 * maximumPercentage(simulations)) / 100);
 
 		mainAxis.setNumberFormatOverride(new NumberFormat() {
 
@@ -96,21 +100,45 @@ public class ComponentFactory {
 				return null;
 			}
 		});
-		TextTitle legendText = new TextTitle("Expected value: " + simulation.expectedValue());
+		
+		BarRenderer renderer = (BarRenderer) barChart.getCategoryPlot().getRenderer();
+		renderer.setBarPainter(new StandardBarPainter());
+
+		LegendItemCollection chartLegend = new LegendItemCollection();
+		Shape shape = new Rectangle(10, 10);
+		for(int i = 0; i < simulations.size(); i++){
+			Color color = new Color((32*i)%256, (32*5*i)%256, (32*10*i)%256);
+			renderer.setSeriesPaint(i, color);
+			chartLegend.add(new LegendItem(simulations.get(i).specification(), null, "Expected value: " + simulations.get(i).expectedValue(), null, shape, color));
+		}		
+		barChart.getCategoryPlot().setFixedLegendItems(chartLegend);
+		TextTitle legendText = new TextTitle("Some nice text goes here");
 		legendText.setPosition(RectangleEdge.TOP);
 		barChart.addSubtitle(legendText);
+		
 		return barChart;
 	}
-	
-	@SafeVarargs
-	private static CategoryDataset createDataset(Map<Integer, Double>... histograms) {		
-		Integer maxNumBuckets = Arrays.asList(histograms).stream().map(m -> m.keySet().size()).max((x,y) -> Integer.compare(x,y)).orElse(0);
-        final Double[][] data = new Double[histograms.length][maxNumBuckets];
-        for(int i = 0; i < histograms.length; i++){
-        	data[i] = paddedDataFrom(histograms[i], maxNumBuckets);
-        }
-        return DatasetUtilities.createCategoryDataset("Series ", "Factor ", data);
-    }
+
+	private static Double maximumPercentage(List<DiceSimulator> simulations) {
+		return simulations.stream()
+				.flatMap(toPercentages())
+				.max((x, y) -> Double.compare(x, y))
+				.map(Double::new)
+				.get();
+	}
+
+	private static Function<DiceSimulator, Stream<Double>> toPercentages() {
+		return sim -> sim.getNormalizedHistogram().values().stream();
+	}
+
+	private static CategoryDataset createDataset(List<Map<Integer, Double>> histograms) {		
+		Integer maxNumBuckets = histograms.stream().map(m -> m.keySet().size()).max((x,y) -> Integer.compare(x,y)).orElse(0);
+		final Double[][] data = new Double[histograms.size()][maxNumBuckets];
+		for(int i = 0; i < histograms.size(); i++){
+			data[i] = paddedDataFrom(histograms.get(i), maxNumBuckets);
+		}
+		return DatasetUtilities.createCategoryDataset("Series ", "Factor ", data);
+	}
 
 	private static Double[] paddedDataFrom(Map<Integer, Double> histogram, Integer maxNumBuckets) {
 		Double[] data = new Double[maxNumBuckets];

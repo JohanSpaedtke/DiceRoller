@@ -20,6 +20,10 @@ public class Die {
 		return lastRoll != 0 ? lastRoll : roll();
 	}
 	
+	public int getFaces(){
+		return faces;
+	}
+	
 	@Override
 	public String toString(){
 		return "d" + faces + " - " + (lastRoll != 0 ? lastRoll : "not rolled");

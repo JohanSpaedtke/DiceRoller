@@ -14,7 +14,6 @@ public class DiceSimulatorTest {
 	public void dummy(){
 		for(int i = 0; i < 1; i++){
 			DiceSimulator d = DiceSimulator.with().diceSpecification("4d6,1d20 keep 3 H").build();
-			d.roll();
 			System.out.println(d.expectedValue());
 			Map<Integer, Double> hist = d.getNormalizedHistogram();
 			System.out.println(hist);
