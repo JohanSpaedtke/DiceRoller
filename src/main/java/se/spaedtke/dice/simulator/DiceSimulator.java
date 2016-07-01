@@ -75,7 +75,7 @@ public class DiceSimulator {
 		}
 	}
 
-	public String specification(){
+	public String getSpecification(){
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.join(",", dice.stream().collect(Collectors.groupingBy(Die::getFaces)).entrySet().stream().map(e -> e.getValue().size() + "d" + e.getKey()).collect(Collectors.toList())));
 		if(staticBonus != 0){
@@ -97,6 +97,10 @@ public class DiceSimulator {
 		return Collections.unmodifiableMap(normalized);
 	}
 
+	@Override
+	public String toString(){
+		return getSpecification();
+	}
 	private Function<Entry<Integer, Integer>, Integer> keepKey() {
 		return e -> e.getKey();
 	}
