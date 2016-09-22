@@ -3,7 +3,6 @@ package se.spaedtke.dice.gui;
 import java.awt.BorderLayout;
 import java.awt.ComponentOrientation;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -20,7 +19,10 @@ import javax.swing.SwingConstants;
 import org.jfree.chart.ChartPanel;
 
 import se.spaedtke.dice.Constants;
+import se.spaedtke.dice.simulator.DiceNotationParser;
 import se.spaedtke.dice.simulator.DiceSimulator;
+import se.spaedtke.dice.simulator.MonteCarloDiceSimulator;
+import se.spaedtke.dice.simulator.SimulationSpecification;
 
 @SuppressWarnings("serial")
 public class ControllPanel extends JPanel {
@@ -34,7 +36,7 @@ public class ControllPanel extends JPanel {
 	public ControllPanel(ChartPanel chart) {
 		BoxLayout boxLayout = new BoxLayout(this, BoxLayout.Y_AXIS);
 		slider = createSlider();
-		SimulationSpecification textField = createTextInput(Constants.INITIAL_DICE_SPEC);
+		SimulationSpecificationField textField = createTextInput(Constants.INITIAL_DICE_SPEC);
 		JPanel rerunButton = createRerunButton(e -> {
 			update(chart, newSimulations(textField.getDiceSpecification().orElse("1d6")));
 			chart.repaint();
@@ -69,8 +71,8 @@ public class ControllPanel extends JPanel {
 		return buttonPanel;
 	}
 
-	public static SimulationSpecification createTextInput(String initialText) {
-		return new SimulationSpecification(initialText);
+	public static SimulationSpecificationField createTextInput(String initialText) {
+		return new SimulationSpecificationField(initialText);
 	}
 
 	private List<DiceSimulator> newSimulations(String diceSpecifications) {
@@ -79,7 +81,7 @@ public class ControllPanel extends JPanel {
 	}
 
 	private Function<String, DiceSimulator> toDiceSimulator() {
-		return string -> DiceSimulator.with().diceSpecification(string).numRuns(new Double(Math.pow(10, slider.getValue())).intValue()).build();
+		return string -> MonteCarloDiceSimulator.from(DiceNotationParser.diceSpecification(string)).numRuns(new Double(Math.pow(10, slider.getValue())).intValue()).numDecimalPlaces(4).build();
 	}
 
 	private static void update(ChartPanel chart, List<DiceSimulator> simulations) {

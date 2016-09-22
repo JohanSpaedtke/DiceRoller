@@ -6,11 +6,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
-public class SimulationSpecification extends JPanel{
+public class SimulationSpecificationField extends JPanel{
 
 	private final JTextField specification;
 	
-	public SimulationSpecification(String initialText){
+	public SimulationSpecificationField(String initialText){
 		specification = new JTextField(30);
 		specification.setText(initialText);
 		specification.setMaximumSize(specification.getPreferredSize());

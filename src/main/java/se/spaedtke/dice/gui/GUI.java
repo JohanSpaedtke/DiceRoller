@@ -10,7 +10,10 @@ import javax.swing.JPanel;
 import org.jfree.chart.ChartPanel;
 
 import se.spaedtke.dice.Constants;
+import se.spaedtke.dice.simulator.CountingDiceSimulator;
+import se.spaedtke.dice.simulator.DiceNotationParser;
 import se.spaedtke.dice.simulator.DiceSimulator;
+import se.spaedtke.dice.simulator.MonteCarloDiceSimulator;
 
 @SuppressWarnings("serial")
 public class GUI extends JFrame {
@@ -31,7 +34,7 @@ public class GUI extends JFrame {
 	}
 
 	private void runInitialSimultaion() {
-		simulations = Arrays.asList(DiceSimulator.with().diceSpecification(Constants.INITIAL_DICE_SPEC).build());
+		simulations = Arrays.asList(MonteCarloDiceSimulator.from(DiceNotationParser.diceSpecification(Constants.INITIAL_DICE_SPEC)).build());
 	}
 
 	private void createComponents() {

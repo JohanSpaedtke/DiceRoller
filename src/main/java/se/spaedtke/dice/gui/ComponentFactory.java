@@ -26,6 +26,7 @@ import org.jfree.data.general.DatasetUtilities;
 import org.jfree.ui.RectangleEdge;
 
 import se.spaedtke.dice.simulator.DiceSimulator;
+import se.spaedtke.dice.simulator.MonteCarloDiceSimulator;
 
 @SuppressWarnings("serial")
 public class ComponentFactory {
@@ -69,7 +70,7 @@ public class ComponentFactory {
 			chartLegend.add(new LegendItem(simulations.get(i).getSpecification(), null, "Expected value: " + simulations.get(i).expectedValue(), null, shape, color));
 		}
 		barChart.getCategoryPlot().setFixedLegendItems(chartLegend);
-		TextTitle legendText = new TextTitle("Some nice text goes here");
+		TextTitle legendText = new TextTitle("Expected value: " + simulations.get(0).expectedValue());
 		legendText.setPosition(RectangleEdge.TOP);
 		barChart.addSubtitle(legendText);
 
