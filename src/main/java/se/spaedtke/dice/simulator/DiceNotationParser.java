@@ -17,29 +17,18 @@ public class DiceNotationParser
 
     /**
      * The supported syntax is described by the following BNF.
-     * A sample of a complex supported expression is
      *
-     * 4d4+1-d3+2-2L
-     * or equivalently
-     * 4d4-d3+3-2L
-     *
-     * Which would translate to
-     *
-     * Roll four d4 and one d3. Drop the two lowest and add 3 (1+2) to the total
-     *
-     * dieExpression ::= <die>[<expressionPart>][<whichToKeep>]
-     * expressionPart ::= <operator><die> | <operator><number>
-     * operator ::= + | -
-     * whichToKeep ::= -<number>(h | H | l | L) | keep [<number>] (highest | h | H | lowest | l | L)
-     * die ::= [<number>]d([<number>] | <customFace>)
-     * customeFace ::= {<number>[<csvNumber>]}
-     * csvDigit ::= "" | ,<number>
+     * totalExpression ::= <partialExpression>(<operator>"("<partialExpression>")")*
+     * partialExpression ::= <staticBonus> | <die><expressionPart>*[<whichToKeep>]
+     * expressionPart ::= <operator><die> | <staticBonus>
+     * staticBonus ::= <operator><number>+
+     * operator ::= + | - | (x | *) | (/ | ÷)
+     * whichToKeep ::= "-"<number>*("h" | "H" | "l" | "L") | "keep" <number>* ("highest" | "h" | "H" | "lowest" | "l" | "L")
+     * die ::= <number>*"d"(<number>+ | <customFace>)
+     * customeFace ::= "{"<number>+<csvNumber>*"}"
+     * csvNumber ::= "" | ","<number>+
      * number ::= 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 0
-     * <p>
-     * Supported formats are </br> XdN (eg. 4d6) </br> XdN+M (eg. 3d4+3)
-     * </br> XdN,YdM (eg. 2d20,1d6 which would mean roll 2d20 and 1d6 and
-     * add the results) </br> XdN,YdM+S (eg. 2d20,1d6+3) </br>
-     */
+      */
     public static SimulationSpecification diceSpecification(String diceSpecification)
     {
         return SimulationSpecification.newBuilder()
