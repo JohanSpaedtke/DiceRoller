@@ -13,7 +13,7 @@ public class SimulationSpecification
     private List<Die> dice;
     private Integer diceToKeep;
     private Integer staticBonus;
-    private String whichToKeep;
+    private WhichToKeep whichToKeep;
 
     private SimulationSpecification(Builder builder)
     {
@@ -38,7 +38,7 @@ public class SimulationSpecification
         return staticBonus;
     }
 
-    public String getWhichToKeep()
+    public WhichToKeep getWhichToKeep()
     {
         return whichToKeep;
     }
@@ -63,7 +63,7 @@ public class SimulationSpecification
         private List<Die> dice;
         private Integer diceToKeep;
         private Integer staticBonus;
-        private String whichToKeep;
+        private WhichToKeep whichToKeep;
 
         private Builder()
         {
@@ -107,7 +107,7 @@ public class SimulationSpecification
             return this;
         }
 
-        public Builder whichToKeep(String val)
+        public Builder whichToKeep(WhichToKeep val)
         {
             whichToKeep = val;
             return this;

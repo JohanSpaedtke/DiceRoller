@@ -114,7 +114,7 @@ public class CountingDiceSimulator implements DiceSimulator
     {
         return list ->
         {
-            if (WhichToKeep.ALL.equals(whichToKeep))
+            if (whichToKeep.howManyToKeep < 0)
             {
                 return list;
             }

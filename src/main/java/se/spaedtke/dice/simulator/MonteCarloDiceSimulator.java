@@ -26,7 +26,7 @@ public class MonteCarloDiceSimulator implements DiceSimulator
 		this.dice = builder.dice;
 		this.numRuns = builder.numRuns != null ? builder.numRuns : 1000000;
 		this.diceToKeep = builder.diceToKeep != null ? builder.diceToKeep : this.dice.size();
-		this.whichToKeep = WhichToKeep.fromString(builder.whichToKeep);
+		this.whichToKeep = builder.whichToKeep;
 		this.precission = builder.numDecimalPlaces != null ? Math.pow(10.0, builder.numDecimalPlaces) : Math.pow(10.0, 2);
 		this.staticBonus = builder.staticBonus != null ? builder.staticBonus : 0;
 		roll();
@@ -107,7 +107,7 @@ public class MonteCarloDiceSimulator implements DiceSimulator
 		private Integer numDecimalPlaces;
 		private Integer diceToKeep;
 		private Integer staticBonus;
-		private String whichToKeep;
+		private WhichToKeep whichToKeep;
 
 		public Builder dice(Die... dice) {
 			this.dice = Arrays.asList(dice);
@@ -139,7 +139,7 @@ public class MonteCarloDiceSimulator implements DiceSimulator
 			return this;
 		}
 
-		public Builder whichToKeep(String whichToKeep) {
+		public Builder whichToKeep(WhichToKeep whichToKeep) {
 			this.whichToKeep = whichToKeep;
 			return this;
 		}

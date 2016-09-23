@@ -17,6 +17,16 @@ public class Die
         this.faces = genFaces(max);
     }
 
+    public Die(List<Integer> faces)
+    {
+        Integer[] customeFaces = new Integer[faces.size()];
+        for (int i = 0; i < faces.size(); i++)
+        {
+            customeFaces[i] = faces.get(i);
+        }
+        this.faces = customeFaces;
+    }
+
     private Integer[] genFaces(int max)
     {
         Integer[] res = new Integer[max];
@@ -27,14 +37,16 @@ public class Die
         return res;
     }
 
-    public Die(Integer... faces){
+    public Die(Integer... faces)
+    {
         this.faces = faces;
     }
 
     public List<Integer> getFaces()
     {
         List<Integer> res = new ArrayList<>(faces.length);
-        for(int face : faces){
+        for (int face : faces)
+        {
             res.add(face);
         }
         return res;
